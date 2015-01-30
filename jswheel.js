@@ -4,6 +4,7 @@ function jswheel(wheelData, pointList, options) {
     this.wheelData = wheelData;
     this.pointList = pointList;
     this.options = options;
+    this.container = document.getElementById(options.containerId);
     this.index = 0;
     this.wheelIndex = 0;
     this.elems = [];
@@ -28,6 +29,10 @@ function jswheel(wheelData, pointList, options) {
     var tmp = this.wheelData.splice(this.wheelData.length - this.options.selectPosition);
     this.wheelData = tmp.concat(this.wheelData);
 
+    this.setReady = function() {
+        this.ready = true;
+    };
+
     this.pixelScaler = function(val, y) {
         var ref_x = 1024;
         var ref_y = 768;
@@ -45,19 +50,17 @@ function jswheel(wheelData, pointList, options) {
     // reset / set positions of all elements
     this.update = function () {
         this.elems = [];
-        $(this.options.container).empty();
+        this.container.innerHTML = null;
 
         for (var e = 0; e < this.pLen; e++) {
             var cur = (e + this.index) % this.pLen;
             var wheelCur = (cur + this.wheelIndex) % this.wheelData.length;
 
-            var elemHTML = [
-                '<img class="ws-elem"',
-                  'src="'+this.wheelData[wheelCur].file+'"',
-                  'style="'+this.options.style+'"',
-                  'title="'+this.wheelData[wheelCur].name+'">',
-                '</img>'
-            ].join(' ');
+            var elemHTML = document.createElement('img');
+            elemHTML.setAttribute('class', 'ws-elem');
+            elemHTML.setAttribute('src', this.wheelData[wheelCur].file);
+            elemHTML.setAttribute('style', this.options.style);
+            elemHTML.setAttribute('title', this.wheelData[wheelCur].name);
 
             var elemTransform = [
                 'translate('+this.pixelScaler(this.pointList[cur][0], 0)+'px,'+
@@ -66,28 +69,29 @@ function jswheel(wheelData, pointList, options) {
                 'scale('+this.pointList[cur][3]+')',
             ].join(' ');
 
-            var newelem = $(elemHTML).css({
+            TweenLite.to(elemHTML, 0, {
                 'transform': elemTransform,
                 'z-index': this.pointList[cur][4],
-            }).appendTo($(this.options.container));
+            });
 
-            this.elems.push(newelem);
+            this.container.appendChild(elemHTML);
+            this.elems.push(elemHTML);
         }
     };
 
-    this.move = function (to) {
+    this.move = function (direction) {
         var toChange, curWheelIndex;
 
-        // avoids animation queuing
+        // avoids animation queuing - IMPROVE THIS
         if (this.ready) {
-            parent = this;
             this.ready = false;
-            setTimeout(function() {parent.ready = true;}, this.options.transitionTime);
+            that = this;
+            setTimeout(function(){that.ready = true}, this.options.minTransitionTime);
         } else {
             return;
         }
 
-        if (to == 'prev') {
+        if (direction == 'prev') {
             this.index = (this.index + 1) % this.pLen;
             this.wheelIndex = (this.wheelIndex + this.wheelData.length - 1) %
                               this.wheelData.length;
@@ -102,8 +106,8 @@ function jswheel(wheelData, pointList, options) {
         }
 
         // change element image and name
-        this.elems[toChange].attr('src', this.wheelData[curWheelIndex].file)
-                            .attr('name', this.wheelData[curWheelIndex].name);
+        this.elems[toChange].setAttribute('src', this.wheelData[curWheelIndex].file);
+        this.elems[toChange].setAttribute('name', this.wheelData[curWheelIndex].name);
 
         // update elements positions, rotation, etc..
         for (var e = 0; e < this.pLen; e++) {
@@ -114,8 +118,11 @@ function jswheel(wheelData, pointList, options) {
                 'rotate('+pointList[cur][2]+'deg)',
                 'scale('+pointList[cur][3]+')',
             ].join(' ');
-            this.elems[e].css({"z-index":pointList[cur][4]});
-            this.elems[e].animate({transform: elemTransform}, this.options.transitionTime);
+            parent = this;
+            TweenLite.to(this.elems[e], 0, {"z-index":pointList[cur][4]});
+            TweenLite.to(this.elems[e], this.options.transitionTime, {transform: elemTransform})
+                     .eventCallback('onComplete', function(){this.ready = true});
+            this.ready = false;
         }
     };
 
