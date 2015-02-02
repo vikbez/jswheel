@@ -1,14 +1,14 @@
 jsWheel
 ========
 
-jQuery module (sorry) that creates a wheel-type menu.
+~~jQuery module (sorry)~~ VANILLA Javascript lib that creates a wheel-type menu.
 Created for a side-project.
 
 * Everything configurable
 * Works with TweenLite for fast speed
 
 ##Usage
-Look at demo/index.html for now.
+Please look at demo/index.html
 
 ##Demo
 
