@@ -47,8 +47,8 @@ function jswheel(wheelData, pointList, options) {
         }
     };
 
-    // reset / set positions of all elements
-    this.update = function () {
+    // init and set positions of all elements
+    this.init = function () {
         this.elems = [];
         this.container.innerHTML = null;
 
@@ -98,16 +98,21 @@ function jswheel(wheelData, pointList, options) {
             toChange = (this.pLen - this.index) % this.pLen;
             curWheelIndex = this.wheelIndex;
 
-        } else {
+        } else if (direction == 'next') {
             this.index = (this.index + this.pLen - 1) % this.pLen;
             this.wheelIndex = (this.wheelIndex + 1) % this.wheelData.length;
             toChange = this.pLen - 1 - this.index;
             curWheelIndex = (this.wheelIndex + this.pLen - 1) % this.wheelData.length;
+
+        } else {
+            toChange = null;
         }
 
-        // change element image and name
-        this.elems[toChange].setAttribute('src', this.wheelData[curWheelIndex].file);
-        this.elems[toChange].setAttribute('name', this.wheelData[curWheelIndex].name);
+        if (toChange !== null) {
+            // change element image and name
+            this.elems[toChange].setAttribute('src', this.wheelData[curWheelIndex].file);
+            this.elems[toChange].setAttribute('name', this.wheelData[curWheelIndex].name);
+        }
 
         // update elements positions, rotation, etc..
         for (var e = 0; e < this.pLen; e++) {
@@ -134,10 +139,14 @@ function jswheel(wheelData, pointList, options) {
         this.move('next');
     };
 
+    this.update = function () {
+        this.move('update');
+    }
+
     this.select = function () {
         return (this.wheelData[(this.wheelIndex + this.options.selectPosition) %
                this.wheelData.length]);
     };
 
-    this.update();
+    this.init();
 };

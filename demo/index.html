@@ -79,18 +79,22 @@ document.addEventListener('DOMContentLoaded', function() {
 	);
 
 	window.addEventListener('keydown', function (e) {
+		// right
 		if (e.keyCode == 39) {
 			spinner.next();
 			e.preventDefault();
 
+		// left
 		} else if (e.keyCode == 37) {
 			spinner.prev();
 			e.preventDefault();
 
+		// space
 		} else if (e.keyCode == 32) {
 			spinner.update();
 			e.preventDefault();
 
+		// enter
 		} else if (e.keyCode == 13) {
 			alert(spinner.select().name);
 			e.preventDefault();
