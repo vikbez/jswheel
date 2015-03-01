@@ -11,27 +11,44 @@ function jswheel(wheelData, pointList, options) {
     this.pLen = this.pointList.length;
     this.ready = true;
 
+    this.options.transitionTime /= 1000;
+
     if (this.pLen < 2) {
         throw "jswheel requires at least two points";
+    }
+
+    var startElemIdx = null;
+    var tmp, i;
+
+    // assures that starting point is the given element name
+    if (this.options.startElem !== undefined) {
+        for (i = 0; i < this.wheelData.length; i++) {
+            if (this.wheelData[i].name.toLowerCase() == this.options.startElem.toLowerCase()) {
+                startElemIdx = i;
+            }
+        }
+
+        var sliceAt = startElemIdx - this.options.selectPosition;
+        sliceAt = sliceAt < 0 ? sliceAt + this.wheelData.length: sliceAt;
+        tmp = this.wheelData.splice(sliceAt);
+        this.wheelData = tmp.concat(this.wheelData);
+    }
+
+    // assures that selection point is the first entry of this.wheelData at start
+    if (startElemIdx === null) {
+        tmp = this.wheelData.splice(this.wheelData.length - this.options.selectPosition);
+        this.wheelData = tmp.concat(this.wheelData);
     }
 
     // if we have less wheel elements than points, multiply wheel elements
     if (this.wheelData.length < this.pLen) {
         var toMult = Math.ceil(this.pLen / this.wheelData.length);
         var newWheelData = this.wheelData;
-        for (var i = 1; i < toMult; i++) {
+        for (i = 1; i < toMult; i++) {
             newWheelData = newWheelData.concat(this.wheelData);
         }
         this.wheelData = newWheelData;
     }
-
-    // assures that selection point is the first entry of this.wheelData at start
-    var tmp = this.wheelData.splice(this.wheelData.length - this.options.selectPosition);
-    this.wheelData = tmp.concat(this.wheelData);
-
-    this.setReady = function() {
-        this.ready = true;
-    };
 
     this.pixelScaler = function(val, y) {
         var ref_x = 1024;
@@ -79,17 +96,8 @@ function jswheel(wheelData, pointList, options) {
         }
     };
 
-    this.move = function (direction) {
+    this.moveTo = function (direction) {
         var toChange, curWheelIndex;
-
-        // avoids animation queuing - IMPROVE THIS
-        if (this.ready) {
-            this.ready = false;
-            that = this;
-            setTimeout(function(){that.ready = true}, this.options.minTransitionTime);
-        } else {
-            return;
-        }
 
         if (direction == 'prev') {
             this.index = (this.index + 1) % this.pLen;
@@ -103,18 +111,37 @@ function jswheel(wheelData, pointList, options) {
             this.wheelIndex = (this.wheelIndex + 1) % this.wheelData.length;
             toChange = this.pLen - 1 - this.index;
             curWheelIndex = (this.wheelIndex + this.pLen - 1) % this.wheelData.length;
-
-        } else {
-            toChange = null;
         }
 
-        if (toChange !== null) {
-            // change element image and name
-            this.elems[toChange].setAttribute('src', this.wheelData[curWheelIndex].file);
-            this.elems[toChange].setAttribute('name', this.wheelData[curWheelIndex].name);
+        // change element image and name
+        this.elems[toChange].setAttribute('src', this.wheelData[curWheelIndex].file);
+        this.elems[toChange].setAttribute('name', this.wheelData[curWheelIndex].name);
+
+        // this.update(this.options.transitionTime);
+    };
+
+    this.moveToLetter = function (direction) {
+        var toChange, curWheelIndex;
+
+        var refLetter = this.wheelData[(this.wheelIndex + this.options.selectPosition) %
+                        this.wheelData.length].name.charAt(0).toLowerCase();
+
+        var curLetter = refLetter;
+        while (refLetter == curLetter) {
+            this.moveTo(direction);
+            curLetter = this.wheelData[(this.wheelIndex + this.options.selectPosition) %
+                        this.wheelData.length].name.charAt(0).toLowerCase();
         }
 
+        this.update();
+    };
+
+    this.update = function (time) {
         // update elements positions, rotation, etc..
+        // this.ready = false;
+        var that = this;
+        time = (time === undefined ? 0 : time);
+
         for (var e = 0; e < this.pLen; e++) {
             var cur = (e + this.index) % this.pLen;
             var elemTransform = [
@@ -123,25 +150,26 @@ function jswheel(wheelData, pointList, options) {
                 'rotate('+pointList[cur][2]+'deg)',
                 'scale('+pointList[cur][3]+')',
             ].join(' ');
-            parent = this;
             TweenLite.to(this.elems[e], 0, {"z-index":pointList[cur][4]});
-            TweenLite.to(this.elems[e], this.options.transitionTime, {transform: elemTransform})
-                     .eventCallback('onComplete', function(){this.ready = true});
-            this.ready = false;
+            TweenLite.to(this.elems[e], time, {transform: elemTransform})
+                     .eventCallback('onComplete', function(){that.ready = true});
         }
     };
 
-    this.prev = function () {
-        this.move('prev');
-    };
+    this.move = function (direction) {
+        // avoids animation queuing - IMPROVE THIS
+        if (this.ready) {
+            this.ready = false;
+            var that = this;
+            setTimeout(function(){that.ready = true;}, this.options.minTransitionTime);
+        } else {
+            console.log('canceled');
+            return;
+        }
 
-    this.next = function () {
-        this.move('next');
+        this.moveTo(direction);
+        this.update(this.options.transitionTime);
     };
-
-    this.update = function () {
-        this.move('update');
-    }
 
     this.select = function () {
         return (this.wheelData[(this.wheelIndex + this.options.selectPosition) %

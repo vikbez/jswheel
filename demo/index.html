@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	var stopPoints = [
 		//list of points used for stops
-		// X, Y, Angle, Scale, z-index
+		// X, Y, Angle, Scale, z-index (scaled on a basis of 1024/768)
 
 		// example 1
 		[100, 100, 50, 0.7, 1],
@@ -73,25 +73,26 @@ document.addEventListener('DOMContentLoaded', function() {
 		stopPoints, // points used for element positions
 		{'containerId': 'container', // wheel container ID
 		 'css': '', // unused
-		 'transitionTime': 0.170, // in s
+		 'transitionTime': 170, // in ms
 		 'minTransitionTime': 100, // in ms, when key kept pressed
-		 'selectPosition': 3} // index of item which serves as cursor
+		 'selectPosition': 3,
+		 'startElem': 'marvel'} // index of item which serves as cursor
 	);
 
 	window.addEventListener('keydown', function (e) {
 		// right
 		if (e.keyCode == 39) {
-			spinner.next();
+			spinner.move('next');
 			e.preventDefault();
 
 		// left
 		} else if (e.keyCode == 37) {
-			spinner.prev();
+			spinner.move('prev');
 			e.preventDefault();
 
 		// space
 		} else if (e.keyCode == 32) {
-			spinner.update();
+			spinner.moveToLetter('next');
 			e.preventDefault();
 
 		// enter
