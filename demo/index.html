@@ -35,8 +35,8 @@ document.addEventListener('DOMContentLoaded', function() {
 	 {"name": "Vertigo", "file": "icons/Vertigo.png"}]};
 
 	var stopPoints = [
-		//list of points used for stops
-		// X, Y, Angle, Scale, z-index (scaled on a basis of 1024/768)
+		// list of points used for stops
+		// X, Y, Angle, Scale, z-index (auto-scaled on a basis of 1024/768)
 
 		// example 1
 		[100, 100, 50, 0.7, 1],
@@ -69,15 +69,23 @@ document.addEventListener('DOMContentLoaded', function() {
 	];
 
 	spinner = new jswheel(
-		wheel_data.elems, // wheel item list {elems: [{name: name, file: image.png}, ...]}
-		stopPoints, // points used for element positions
-		{'containerId': 'container', // wheel container ID
-		 'css': '', // unused
-		 'transitionTime': 170, // in ms
-		 'minTransitionTime': 100, // in ms, when key kept pressed
-		 'selectPosition': 3,
-		 'startElem': 'marvel'} // index of item which serves as cursor
+		wheel_data.elems, 						// wheel item list {elems: [{name: name, file: image.png}, ...]}
+		stopPoints, 									// points used for element positions
+		{'containerId': 'container', 	// wheel container ID
+		 'transitionTime': 170, 			// in ms
+		 'minTransitionTime': 100, 		// in ms, when key kept pressed
+		 'selectPosition': 3, 				// active element position for selection
+		 'startElem': 'marvel'} 			// index of item which serves as cursor
 	);
+
+	// we override the pixelScaler function (for pixel position)
+	// if no override, default function scales items compared to a 1024x768 screen (percentage-like position)
+	spinner.pixelScaler = function(value, is_y) {
+		return (value);
+	};
+
+	// re-render
+	spinner.update();
 
 	window.addEventListener('keydown', function (e) {
 		// right
@@ -90,12 +98,12 @@ document.addEventListener('DOMContentLoaded', function() {
 			spinner.move('prev');
 			e.preventDefault();
 
-		// space
+		// space moves to next letter
 		} else if (e.keyCode == 32) {
 			spinner.moveToLetter('next');
 			e.preventDefault();
 
-		// enter
+		// enter selects an item
 		} else if (e.keyCode == 13) {
 			alert(spinner.select().name);
 			e.preventDefault();

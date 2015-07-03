@@ -50,6 +50,7 @@ function jswheel(wheelData, pointList, options) {
         this.wheelData = newWheelData;
     }
 
+    // used to handle percentage-like positionning (override this to your usage)
     this.pixelScaler = function(val, y) {
         var ref_x = 1024;
         var ref_y = 768;
