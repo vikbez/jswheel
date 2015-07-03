@@ -83,7 +83,7 @@ function jswheel(wheelData, pointList, options) {
                 'translate('+this.pixelScaler(this.pointList[cur][0], 0)+'px,'+
                              this.pixelScaler(this.pointList[cur][1], 1)+'px)',
                 'rotate('+this.pointList[cur][2]+'deg)',
-                'scale('+this.pointList[cur][3]+')',
+                'scale('+this.pixelScaler(this.pointList[cur][3], 1)+')',
             ].join(' ');
 
             TweenLite.to(elemHTML, 0, {
@@ -148,7 +148,7 @@ function jswheel(wheelData, pointList, options) {
                 'translate('+this.pixelScaler(pointList[cur][0], 0)+'px,'+
                              this.pixelScaler(pointList[cur][1], 1)+'px)',
                 'rotate('+pointList[cur][2]+'deg)',
-                'scale('+pointList[cur][3]+')',
+                'scale('+this.pixelScaler(pointList[cur][3], 1)+')',
             ].join(' ');
             TweenLite.to(this.elems[e], 0, {"z-index":pointList[cur][4]});
             TweenLite.to(this.elems[e], time, {transform: elemTransform})
