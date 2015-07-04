@@ -13,6 +13,14 @@ function jswheel(wheelData, pointList, options) {
 
     this.options.transitionTime /= 1000;
 
+    if (this.options.hideDuration) {
+        this.options.hideDuration /= 1000;
+    }
+
+    if (this.options.hideStart) {
+        this.options.hideStart /= 1000;
+    }
+
     if (this.pLen < 2) {
         throw "jswheel requires at least two points";
     }
@@ -95,6 +103,25 @@ function jswheel(wheelData, pointList, options) {
             this.container.appendChild(elemHTML);
             this.elems.push(elemHTML);
         }
+        this.hide();
+    };
+
+    this.show = function () {
+        if (this.options.hide) {
+            // clearTimeout(this.hideAnim);
+            TweenLite.killTweensOf(this.container);
+            TweenLite.to(this.container, 0, {opacity: 1});
+        }
+    };
+
+    this.hide = function (time) {
+        if (this.options.hide) {
+            TweenLite.to(
+                this.container,
+                this.options.hideDuration,
+                {opacity: 0, delay: this.options.hideStart + time}
+            );
+        }
     };
 
     this.moveTo = function (direction) {
@@ -117,8 +144,6 @@ function jswheel(wheelData, pointList, options) {
         // change element image and name
         this.elems[toChange].setAttribute('src', this.wheelData[curWheelIndex].file);
         this.elems[toChange].setAttribute('name', this.wheelData[curWheelIndex].name);
-
-        // this.update(this.options.transitionTime);
     };
 
     this.moveToLetter = function (direction) {
@@ -142,6 +167,7 @@ function jswheel(wheelData, pointList, options) {
         // this.ready = false;
         var that = this;
         time = (time === undefined ? 0 : time);
+        this.show();
 
         for (var e = 0; e < this.pLen; e++) {
             var cur = (e + this.index) % this.pLen;
@@ -153,8 +179,9 @@ function jswheel(wheelData, pointList, options) {
             ].join(' ');
             TweenLite.to(this.elems[e], 0, {"z-index":pointList[cur][4]});
             TweenLite.to(this.elems[e], time, {transform: elemTransform})
-                     .eventCallback('onComplete', function(){that.ready = true});
+                     .eventCallback('onComplete', function(){that.ready = true;});
         }
+        this.hide(time);
     };
 
     this.move = function (direction) {
@@ -164,7 +191,6 @@ function jswheel(wheelData, pointList, options) {
             var that = this;
             setTimeout(function(){that.ready = true;}, this.options.minTransitionTime);
         } else {
-            console.log('canceled');
             return;
         }
 
