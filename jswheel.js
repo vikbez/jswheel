@@ -60,8 +60,8 @@ function jswheel(wheelData, pointList, options) {
 
     // used to handle percentage-like positionning (override this to your usage)
     this.pixelScaler = function(val, y) {
-        var ref_x = 1024;
-        var ref_y = 768;
+        var ref_x = 100;
+        var ref_y = 100;
 
         var win_x = window.innerWidth;
         var win_y = window.innerHeight;

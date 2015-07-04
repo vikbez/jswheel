@@ -81,8 +81,8 @@ document.addEventListener('DOMContentLoaded', function() {
 		 'startElem': 'marvel'} 			// index of item which serves as cursor
 	);
 
-	// we override the pixelScaler function (for pixel position)
-	// if no override, default function scales items compared to a 1024x768 screen (percentage-like position)
+	// we override the pixelScaler function (for element position)
+	// if no override, default function uses percentages for positions
 	spinner.pixelScaler = function(value, is_y) {
 		return (value);
 	};
