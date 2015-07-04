@@ -59,17 +59,16 @@ function jswheel(wheelData, pointList, options) {
     }
 
     // used to handle percentage-like positionning (override this to your usage)
-    this.pixelScaler = function(val, y) {
-        var ref_x = 100;
-        var ref_y = 100;
-
+    this.scaler = function(value, type) {
         var win_x = window.innerWidth;
         var win_y = window.innerHeight;
 
-        if (y) {
-            return (val * win_y / ref_y);
-        } else {
-            return (val * win_x / ref_x);
+        if (type === 'x') {
+            return (value * win_x / 100);
+        } else if (type === 'y') {
+            return (value * win_y / 100);
+        } else if (type === 'scale') {
+            return (value * (win_y / 700));
         }
     };
 
@@ -89,10 +88,10 @@ function jswheel(wheelData, pointList, options) {
             elemHTML.setAttribute('title', this.wheelData[wheelCur].name);
 
             var elemTransform = [
-                'translate('+this.pixelScaler(this.pointList[cur][0], 0)+'px,'+
-                             this.pixelScaler(this.pointList[cur][1], 1)+'px)',
+                'translate('+this.scaler(this.pointList[cur][0], 'x')+'px,'+
+                             this.scaler(this.pointList[cur][1], 'y')+'px)',
                 'rotate('+this.pointList[cur][2]+'deg)',
-                'scale('+this.pixelScaler(this.pointList[cur][3], 1)+')',
+                'scale('+this.scaler(this.pointList[cur][3], 'scale')+')',
             ].join(' ');
 
             TweenLite.to(elemHTML, 0, {
@@ -172,10 +171,10 @@ function jswheel(wheelData, pointList, options) {
         for (var e = 0; e < this.pLen; e++) {
             var cur = (e + this.index) % this.pLen;
             var elemTransform = [
-                'translate('+this.pixelScaler(pointList[cur][0], 0)+'px,'+
-                             this.pixelScaler(pointList[cur][1], 1)+'px)',
+                'translate('+this.scaler(pointList[cur][0], 'x')+'px,'+
+                             this.scaler(pointList[cur][1], 'y')+'px)',
                 'rotate('+pointList[cur][2]+'deg)',
-                'scale('+this.pixelScaler(pointList[cur][3], 1)+')',
+                'scale('+this.scaler(pointList[cur][3], 'scale')+')',
             ].join(' ');
             TweenLite.to(this.elems[e], 0, {"z-index":pointList[cur][4]});
             TweenLite.to(this.elems[e], time, {transform: elemTransform})

@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		wheel_data.elems, 						// wheel item list {elems: [{name: name, file: image.png}, ...]}
 		stopPoints, 									// points used for element positions
 		{'containerId': 'container', 	// wheel container ID
-		 'transitionTime': 170, 			// in ms
+		 'transitionTime': 270, 			// in ms
 		 'minTransitionTime': 100, 		// in ms, when key kept pressed
 		 'selectPosition': 3, 				// active element position for selection
 		 'hide': true,								// If this is true, hide wheel after a certain amount of time
@@ -81,9 +81,10 @@ document.addEventListener('DOMContentLoaded', function() {
 		 'startElem': 'marvel'} 			// index of item which serves as cursor
 	);
 
-	// we override the pixelScaler function (for element position)
+	// we override the scaler function (for element position)
 	// if no override, default function uses percentages for positions
-	spinner.pixelScaler = function(value, is_y) {
+	// type is an string telling what we are getting (can be 'x', 'y', 'scale')
+	spinner.scaler = function(value, type) {
 		return (value);
 	};
 
