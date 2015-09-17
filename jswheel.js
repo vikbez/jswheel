@@ -10,6 +10,7 @@ function jswheel(wheelData, pointList, options) {
     this.elems = [];
     this.pLen = this.pointList.length;
     this.ready = true;
+    this.container.style.perspective = options.perspective;
 
     this.options.transitionTime /= 1000;
 
@@ -90,13 +91,12 @@ function jswheel(wheelData, pointList, options) {
             var elemTransform = [
                 'translate('+this.scaler(this.pointList[cur][0], 'x')+'px,'+
                              this.scaler(this.pointList[cur][1], 'y')+'px)',
-                'rotate('+this.pointList[cur][2]+'deg)',
-                'scale('+this.scaler(this.pointList[cur][3], 'scale')+')',
+                this.pointList[cur][2],
             ].join(' ');
 
             TweenLite.to(elemHTML, 0, {
                 'transform': elemTransform,
-                'z-index': this.pointList[cur][4],
+                'z-index': this.pointList[cur][3],
             });
 
             this.container.appendChild(elemHTML);
@@ -173,10 +173,9 @@ function jswheel(wheelData, pointList, options) {
             var elemTransform = [
                 'translate('+this.scaler(pointList[cur][0], 'x')+'px,'+
                              this.scaler(pointList[cur][1], 'y')+'px)',
-                'rotate('+pointList[cur][2]+'deg)',
-                'scale('+this.scaler(pointList[cur][3], 'scale')+')',
+                this.pointList[cur][2],
             ].join(' ');
-            TweenLite.to(this.elems[e], 0, {"z-index":pointList[cur][4]});
+            TweenLite.to(this.elems[e], 0, {"z-index":pointList[cur][3]});
             TweenLite.to(this.elems[e], time, {transform: elemTransform})
                      .eventCallback('onComplete', function(){that.ready = true;});
         }
