@@ -12,6 +12,10 @@ function jswheel(wheelData, pointList, options) {
     this.ready = true;
     this.container.style.perspective = options.perspective;
 
+    for (var i in options.containerStyle) {
+        this.container.style[i] = options.containerStyle[i];
+    }
+
     this.options.transitionTime /= 1000;
 
     if (this.options.hideDuration) {
@@ -27,7 +31,7 @@ function jswheel(wheelData, pointList, options) {
     }
 
     var startElemIdx = null;
-    var tmp, i;
+    var tmp;
 
     // assures that starting point is the given element name
     if (this.options.startElem !== undefined) {
@@ -91,7 +95,8 @@ function jswheel(wheelData, pointList, options) {
             var elemTransform = [
                 'translate('+this.scaler(this.pointList[cur][0], 'x')+'px,'+
                              this.scaler(this.pointList[cur][1], 'y')+'px)',
-                this.pointList[cur][2],
+                'scale('+this.scaler(this.pointList[cur][2], 'scale')+')',
+                this.pointList[cur][4],
             ].join(' ');
 
             TweenLite.to(elemHTML, 0, {
@@ -173,7 +178,8 @@ function jswheel(wheelData, pointList, options) {
             var elemTransform = [
                 'translate('+this.scaler(pointList[cur][0], 'x')+'px,'+
                              this.scaler(pointList[cur][1], 'y')+'px)',
-                this.pointList[cur][2],
+                'scale('+this.scaler(this.pointList[cur][2], 'scale')+')',
+                this.pointList[cur][4],
             ].join(' ');
             TweenLite.to(this.elems[e], 0, {"z-index":pointList[cur][3]});
             TweenLite.to(this.elems[e], time, {transform: elemTransform})
