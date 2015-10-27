@@ -86,9 +86,14 @@ function jswheel(wheelData, pointList, options) {
             var cur = (e + this.index) % this.pLen;
             var wheelCur = (cur + this.wheelIndex) % this.wheelData.length;
 
-            var elemHTML = document.createElement('img');
+            var elemHTML = document.createElement('div');
+            if (this.wheelData[wheelCur].html === undefined) {
+                this.wheelData[wheelCur].html = '<img src="%file%" title="%name%">';
+            }
+            elemHTML.innerHTML = this.wheelData[wheelCur].html
+                .replace(/%file%/g, this.wheelData[wheelCur].file)
+                .replace(/%name%/g, this.wheelData[wheelCur].name);
             elemHTML.setAttribute('class', 'ws-elem');
-            elemHTML.setAttribute('src', this.wheelData[wheelCur].file);
             elemHTML.setAttribute('style', this.options.style);
             elemHTML.setAttribute('title', this.wheelData[wheelCur].name);
 
@@ -96,12 +101,13 @@ function jswheel(wheelData, pointList, options) {
                 'translate('+this.scaler(this.pointList[cur][0], 'x')+'px,'+
                              this.scaler(this.pointList[cur][1], 'y')+'px)',
                 'scale('+this.scaler(this.pointList[cur][2], 'scale')+')',
-                this.pointList[cur][4],
+                this.pointList[cur][4], // replace css-transformation to full-css support
             ].join(' ');
 
             TweenLite.to(elemHTML, 0, {
                 'transform': elemTransform,
                 'z-index': this.pointList[cur][3],
+                // add full css here
             });
 
             this.container.appendChild(elemHTML);
@@ -146,8 +152,13 @@ function jswheel(wheelData, pointList, options) {
         }
 
         // change element image and name
-        this.elems[toChange].setAttribute('src', this.wheelData[curWheelIndex].file);
-        this.elems[toChange].setAttribute('name', this.wheelData[curWheelIndex].name);
+        if (this.wheelData[curWheelIndex].html === undefined) {
+            this.wheelData[curWheelIndex].html = '<img src="%file%" title="%name%">';
+        }
+        this.elems[toChange].innerHTML = this.wheelData[curWheelIndex].html
+            .replace(/%file%/g, this.wheelData[curWheelIndex].file)
+            .replace(/%name%/g, this.wheelData[curWheelIndex].name);
+        this.elems[toChange].setAttribute('title', this.wheelData[curWheelIndex].name);
     };
 
     this.moveToLetter = function (direction) {
