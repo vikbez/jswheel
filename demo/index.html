@@ -62,11 +62,11 @@ document.addEventListener('DOMContentLoaded', function() {
 		// (position auto-scaled on a basis of 1024/768)
 
 		// example NEW
-		[100, 20, 1, 3, 'translateZ(150px) rotateY(40deg)'],
-		[190, 20, 1, 2, 'translateZ(50px) rotateY(20deg)'],
-		[300, 20, 1, 1, 'translateZ(10px) rotateY(0deg)'],
-		[410, 20, 1, 2, 'translateZ(50px) rotateY(-20deg)'],
-		[500, 20, 1, 3, 'translateZ(150px) rotateY(-40deg)'],
+		{x:120, y:100, scale:1, zIndex:3, z:150, rotationY:40},
+		{x:300, y:100, scale:1, zIndex:2, z:50, rotationY:20},
+		{x:500, y:100, scale:1, zIndex:1, z:10, rotationY:0},
+		{x:700, y:100, scale:1, zIndex:2, z:50, rotationY:-20},
+		{x:880, y:100, scale:1, zIndex:3, z:150, rotationY:-40},
 	];
 
 	spinner = new jswheel(

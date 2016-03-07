@@ -2,7 +2,7 @@
 
 function jswheel(wheelData, pointList, options) {
     this.wheelData = wheelData;
-    this.pointList = pointList;
+    this.pointList = JSON.parse(JSON.stringify(pointList));
     this.options = options;
     this.container = document.getElementById(options.containerId);
     this.index = 0;
@@ -69,11 +69,11 @@ function jswheel(wheelData, pointList, options) {
         var win_y = window.innerHeight;
 
         if (type === 'x') {
-            return (value * win_x / 100);
+            return (value * win_x / 100).toFixed(3);
         } else if (type === 'y') {
-            return (value * win_y / 100);
+            return (value * win_y / 100).toFixed(3);
         } else if (type === 'scale') {
-            return (value * (win_y / 700));
+            return (value * (win_y / 700)).toFixed(3);
         }
     };
 
@@ -97,22 +97,10 @@ function jswheel(wheelData, pointList, options) {
             elemHTML.setAttribute('style', this.options.style);
             elemHTML.setAttribute('title', this.wheelData[wheelCur].name);
 
-            var elemTransform = [
-                'translate('+this.scaler(this.pointList[cur][0], 'x')+'px,'+
-                             this.scaler(this.pointList[cur][1], 'y')+'px)',
-                'scale('+this.scaler(this.pointList[cur][2], 'scale')+')',
-                this.pointList[cur][4], // replace css-transformation to full-css support
-            ].join(' ');
-
-            TweenLite.to(elemHTML, 0, {
-                'transform': elemTransform,
-                'z-index': this.pointList[cur][3],
-                // add full css here
-            });
-
             this.container.appendChild(elemHTML);
             this.elems.push(elemHTML);
         }
+        this.update();
         this.hide();
     };
 
@@ -185,15 +173,22 @@ function jswheel(wheelData, pointList, options) {
         this.show();
 
         for (var e = 0; e < this.pLen; e++) {
+            this.pointList[e].x = this.scaler(pointList[e].x, 'x');
+            this.pointList[e].y = this.scaler(pointList[e].y, 'y');
+            this.pointList[e].scale = this.scaler(pointList[e].scale, 'scale');
+        }
+
+        for (var e = 0; e < this.pLen; e++) {
             var cur = (e + this.index) % this.pLen;
-            var elemTransform = [
-                'translate('+this.scaler(pointList[cur][0], 'x')+'px,'+
-                             this.scaler(pointList[cur][1], 'y')+'px)',
-                'scale('+this.scaler(this.pointList[cur][2], 'scale')+')',
-                this.pointList[cur][4],
-            ].join(' ');
-            TweenLite.to(this.elems[e], 0, {"z-index":pointList[cur][3]});
-            TweenLite.to(this.elems[e], time, {transform: elemTransform})
+            // copy object since TweenLite use existing object for transformation
+            var elemTransform = {};
+            for (i in this.pointList[cur]) {
+                elemTransform[i] = this.pointList[cur][i];
+            }
+            if (elemTransform.zIndex) {
+                TweenLite.to(this.elems[e], 0, {zIndex: elemTransform.zIndex});
+            }
+            TweenLite.to(this.elems[e], time, elemTransform)
                      .eventCallback('onComplete', function(){that.ready = true;});
         }
         this.hide(time);
