@@ -188,6 +188,9 @@ function jswheel(wheelData, pointList, options) {
             if (elemTransform.zIndex) {
                 TweenLite.to(this.elems[e], 0, {zIndex: elemTransform.zIndex});
             }
+            if (elemTransform.opacity !== undefined) {
+                TweenLite.to(this.elems[e], 0, {opacity: elemTransform.opacity});
+            }
             TweenLite.to(this.elems[e], time, elemTransform)
                      .eventCallback('onComplete', function(){that.ready = true;});
         }
